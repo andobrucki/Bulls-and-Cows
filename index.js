@@ -1,48 +1,37 @@
 // Bulls and Cows
-// Get library for user input
-// we need to keep the next line, so we can prompt the user for input
+// Chalk and readline Sync
+const chalk = require('chalk');
 const prompt = require('prompt-sync')({ sigint: true });
 
-let name = prompt('What is your name? ');
-let lengthSecretNum = prompt('What is your favorite number between 2 and 6?');
+let name = prompt(chalk.magenta('What is your name? '));
+let lengthSecretNum = prompt(
+	chalk.magenta('What is your favorite number between 2 and 6? ')
+);
 
-//1. Function > Computer comes up with secret number
+//Function > Computer comes up with secret number
 function createSecretNumber(length) {
 	const digits = [];
 	while (digits.length < length) {
 		const digit = Math.floor(Math.random() * 10).toString();
-		if(!digits.includes(digit)) {
+		if (!digits.includes(digit)) {
 			digits.push(digit);
 		}
 	}
 	return digits.join('');
 }
 
-const secretNumber = createSecretNumber(lengthSecretNum);
-
-// //2. Function > checks if the number is a valid number:
-// function checkNumber(number) {
-// 	if (number.length !== 4) {
-// 		return false;
-// 	}
-// 	for (let i = 0; i < number.length; i++) {
-// 		if (number.indexOf(number[i]) !== i) {
-// 			return false;
-// 		}
-// 	}
-// 	return `Ok, ${secretNumber} is a valid number. Now let's see if the player can guess it.`;
-// }
-// console.log(checkNumber(secretNumber));
+const secretNumber = createSecretNumber(lengthSecretNum); // might change that to length according to level
 
 // Function > ask if user knows the rules
 function askForTheRules() {
-	let question = prompt(`Do you know the rules of the game ${name}? Y/N: `);
+	let question = prompt(
+		chalk.black.yellow(`Do you know the rules of the game ${name}? Y/N: `)
+	);
 	console.clear();
 	if (question.toUpperCase() === 'N') {
-		showInstructions(4);
-		//	  console.log(`\n${rulesMessage}\n\nLet´s go ${findTheUser}\n`);
+		showInstructions(lengthSecretNum);
 	} else {
-		console.log(`\nLet´s go ${name}`);
+		console.log(chalk.yellow(`\nLet´s go, ${name}`));
 	}
 }
 askForTheRules();
@@ -50,68 +39,106 @@ askForTheRules();
 // Function > show instructions
 function showInstructions(len) {
 	console.log();
-	console.log('Bulls and Cows Game');
-	console.log('-------------------');
+	console.log(chalk.blueBright('Bulls 🐂 and Cows 🐄 Game'));
+	console.log(chalk.blueBright('-------------------'));
 	console.log(
-		'  You must guess the ' + len + ' digit number I am thinking of.'
+		chalk.blueBright(
+			'  You must guess the ' + len + ' digit number I am thinking of.'
+		)
 	);
-	console.log('  The number is composed of the digits 1-9.');
-	console.log('  No digit appears more than once.');
-	console.log('  After each of your guesses, I will tell you:');
-	console.log('    The number of bulls (digits in right place)');
+	console.log(chalk.blueBright('  The number is composed of the digits 1-9.'));
+	console.log(chalk.blueBright('  No digit appears more than once.'));
 	console.log(
-		'    The number of cows (correct digits, but in the wrong place)'
+		chalk.blueBright('  After each of your guesses, I will tell you:')
+	);
+	console.log(
+		chalk.blueBright('    The number of bulls (digits in right place)')
+	);
+	console.log(
+		chalk.blueBright(
+			'    The number of cows (correct digits, but in the wrong place)'
+		)
 	);
 	console.log();
 }
 
-// Function // Compare users guess with secret number
-// function wrongInputAlert(number, input) {
-// 	if (number.length !== input.length) {
-// 		console.log(
-// 			`${input} is not a valid number! You need ${secretNumber.length} digits!`
-// 		);
-// 		return false;
-// 	}
-// 	if (!/^\d+$/.test(input)) {
-// 		console.log(`Hey, only numbers are allowed! Try again, ${name}!`);
-// 		return false;
-// 	}
-// 	return true;
-// }
+// Function Compare users guess with secret number
+function wrongInputAlert(number, input) {
+	if (number.length !== input.length) {
+		console.log(
+			chalk.red(
+				`${input} is not a valid number! You need ${secretNumber.length} digits!`
+			)
+		);
+		return false;
+	}
+	if (!/^\d+$/.test(input)) {
+		console.log(chalk.red(`Hey, only numbers are allowed!`));
+		return false;
+	}
+	return true;
+}
 
-// wrongInputAlert(secretNumber, guessedNumber);
+function randomMessage () {
+	const randomMessages = ['You did not match any numbers, try again.', 'Not a match, try your luck again!','Not the winning combo, but do not give up yet!', 'Those numbers were not magic. Go for another round!']
+}
 
-
+// Function play again
+function playAgain() {
+	let playAgainGame = '';
+	playAgainGame = prompt(chalk.yellow(`Do you want to play again? Y / N `));
+	if (playAgainGame.toUpperCase() === 'Y') {
+		return start();
+	} else if (playAgainGame.toUpperCase() === 'N') {
+		console.log(
+			chalk.yellow(`Thanks for participating, ${name}. See you next time.`)
+		);
+	} else console.log(chalk.yellow(`Invalid input.`));
+}
 // Function Play the Game
 function playTheGame() {
-	
 	let attempts = 0;
 	while (true) {
 		attempts++;
-		guessedNumber = prompt('Guess a number: ')
-		if (secretNumber === guessedNumber) {
-			console.log(`Congrats, ${name}, you won!`);
-			break;
+		const guessedNumber = prompt(chalk.yellow('Guess a number: '));
+		if (!wrongInputAlert(secretNumber, guessedNumber)) {
+			continue; //refer to function wronInputAlert that checks whether guessed input is valid / if yes, continue
 		}
-	// now setting up cows and bulls
-	// if the number is in the right position it will count a bull
-	// if the number is right but in the wrong position it will count a cow
+
+		if (secretNumber === guessedNumber) {
+			console.log(
+				chalk.magentaBright(
+					`Congrats, ${name}, you won after ${attempts} attempts!`
+				)
+			);
+			break; //Exit when secret number and guessed number match
+		}
+
+		// now setting up cows and bulls
+		// if the number is in the right position it will count a bull
+		// if the number is right but in the wrong position it will count a cow
 		let cows = 0;
 		let bulls = 0;
 		for (let i = 0; i < secretNumber.length; i++) {
 			if (secretNumber[i] === guessedNumber[i]) {
+				// if numbers at same position bulls get increased
 				bulls++;
 			} else if (secretNumber.includes(guessedNumber[i])) {
+				// if string includes number cows get increased
 				cows++;
 			}
 		}
-
+		//result:
 		if (bulls === 0 && cows === 0) {
-			console.log(`You did not match any numbers, try again.`);
+			console.log(chalk.red(`You did not match any numbers, try again.`));
 		} else {
-			console.log(`You found ${cows} cow  and ${bulls} bulls.`);
+			console.log(chalk.blue(`You found ${cows} cows and ${bulls} bulls.`));
 		}
 	}
 }
-playTheGame();
+
+function start() {
+	playTheGame();
+	playAgain();
+}
+start();
