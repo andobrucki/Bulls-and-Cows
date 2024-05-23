@@ -3,9 +3,19 @@
 const chalk = require('chalk');
 const prompt = require('prompt-sync')({ sigint: true });
 
-let name = prompt(chalk.magenta('What is your name? '));
+const name = prompt(chalk.magenta('What is your name? '));
+const randomMessages = [
+	'You did not match any numbers, try again.',
+	'Not a match, try your luck again!',
+	'Not the winning combo, but do not give up yet!',
+	'Those numbers were not magic. Go for another round!',
+	'Try again',
+	'Not your day, give it another try',
+	'Roll the dice again!',
+];
 
-// Function for choosing level
+// Function: choosing level
+// the level chooser function generates the length of the secret word
 function levelChooser() {
 	let lengthSecretNum = 0;
 	let levelInput = prompt(
@@ -29,7 +39,8 @@ function levelChooser() {
 	return lengthSecretNum;
 }
 
-//Function > Creating secret number
+//Function: Creating secret number
+//Secret number based on length from level function // individual digits
 function createSecretNumber(length) {
 	const digits = [];
 	while (digits.length < length) {
@@ -41,12 +52,10 @@ function createSecretNumber(length) {
 	return digits.join('');
 }
 
-const secretNumber = createSecretNumber(levelChooser());
-
-// Function > ask if user knows the rules
-// If the user knows the rules she starts playing right away 
+// Function: ask if user knows the rules
+// If the user knows the rules she starts playing right away
 // If she doesn't showInstructions() based on the secretNumber length
-function askForTheRules() {
+function askForTheRules(secretNumber) {
 	let question = prompt(
 		chalk.black.yellow(`Do you know the rules of the game ${name}? Y/N: `)
 	);
@@ -57,20 +66,19 @@ function askForTheRules() {
 		console.log(chalk.yellow(`\nLet´s go, ${name}`));
 	}
 }
-askForTheRules();
 
-// Function > show instructions
+// Function: show instructions
 function showInstructions(len) {
 	let instructions = `Bulls 🐂 and Cows 🐄 Game\n-------------------\n Acoording to your level choice you must guess the ${len} digit number I am thinking of. \n The number is composed of the digits 1-9.\n No digit appears more than once.\n After each of your guesses, I will tell you:\n The number of 🐂 bulls (digits in right place)\n The number of 🐄 cows (correct digits, but in the wrong place)\n `;
 	console.log(chalk.blue(instructions));
 }
 
-// Function Compare users guess with secret number
+// Function: wrong input alert // compare users guess with secret number
 function wrongInputAlert(number, input) {
 	if (number.length !== input.length) {
 		console.log(
 			chalk.red(
-				`${input} is not a valid number! You need ${secretNumber.length} digits!`
+				`${input} is not a valid number! You need ${number.length} digits!`
 			)
 		);
 		return false;
@@ -82,43 +90,37 @@ function wrongInputAlert(number, input) {
 	return true;
 }
 
-// Function for random message
+// Function: generates random message if user does not match any numbers
 function randomMessage() {
-	const randomMessages = [
-		'You did not match any numbers, try again.',
-		'Not a match, try your luck again!',
-		'Not the winning combo, but do not give up yet!',
-		'Those numbers were not magic. Go for another round!',
-		'Try again',
-		'Not your day, give it another try',
-		'Roll the dice again!',
-	];
 	let randomMessage =
 		randomMessages[Math.floor(Math.random() * randomMessages.length)];
 	return randomMessage;
 }
 
-// Function play again
+// Function: play game again
 function playAgain() {
 	let playAgainGame = '';
 	playAgainGame = prompt(chalk.yellow(`Do you want to play again? Y / N `));
 	if (playAgainGame.toUpperCase() === 'Y') {
-		return start();
+		start();
 	} else if (playAgainGame.toUpperCase() === 'N') {
 		console.log(
 			chalk.yellow(`Thanks for participating, ${name}. See you next time.`)
 		);
-	} else console.log(chalk.yellow(`Invalid input.`));
+	} else {
+		console.log(chalk.yellow(`Invalid input.`));
+		playAgain();
+	}
 }
 
-// Function Play the Game
-function playTheGame() {
+// Function: Play the Game
+function playTheGame(secretNumber) {
 	let attempts = 0;
 	while (true) {
 		attempts++;
 		const guessedNumber = prompt(chalk.yellow('Guess a number: '));
 		if (!wrongInputAlert(secretNumber, guessedNumber)) {
-			continue; //refer to function wrongInputAlert that checks whether guessed input is valid / if yes, continue
+			continue; //refer to function wrongInputAlert // if it returns false program continues
 		}
 		if (secretNumber === guessedNumber) {
 			console.log(
@@ -126,7 +128,7 @@ function playTheGame() {
 					`Congrats, ${name}, you won after ${attempts} attempts!`
 				)
 			);
-			break; //Exit when secret number and guessed number match
+			break; //Exit when secret number and guessed number match // Won!
 		}
 		// now setting up cows and bulls
 		// if the number is in the right position it will count a bull
@@ -150,11 +152,22 @@ function playTheGame() {
 				chalk.blue(`You found ${cows} 🐄 cows and ${bulls} 🐂 bulls.`)
 			);
 		}
+		if (attempts > 10) {
+			console.log(
+				chalk.greenBright.bgBlackBright(
+					'Game over! You reached the maximum of 10 attempts.'
+				)
+			);
+			break;
+		}
 	}
 }
 
 function start() {
-	playTheGame();
+	const lengthSecretNum = levelChooser();
+	const secretNumber = createSecretNumber(lengthSecretNum);
+	askForTheRules(secretNumber);
+	playTheGame(secretNumber);
 	playAgain();
 }
 start();
