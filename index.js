@@ -3,7 +3,6 @@
 const chalk = require('chalk');
 const prompt = require('prompt-sync')({ sigint: true });
 
-const name = prompt(chalk.magenta('What is your name? '));
 const randomMessages = [
 	'You did not match any numbers, try again.',
 	'Not a match, try your luck again!',
@@ -13,6 +12,13 @@ const randomMessages = [
 	'Not your day, give it another try',
 	'Roll the dice again!',
 ];
+
+// Function for user name
+let name = prompt('What is your name? ');
+function createUserName(nameInput) {
+	!nameInput ? (name = 'Stranger') : (name = name);
+}
+createUserName(name);
 
 // Function: choosing level
 // the level chooser function generates the length of the secret word
