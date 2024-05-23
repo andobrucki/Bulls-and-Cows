@@ -1,12 +1,45 @@
 // Bulls and Cows
-// Chalk and readline Sync
+// Setting up chalk and readline Sync
 const chalk = require('chalk');
 const prompt = require('prompt-sync')({ sigint: true });
 
 let name = prompt(chalk.magenta('What is your name? '));
-let lengthSecretNum = prompt(
-	chalk.magenta('What is your favorite number between 2 and 6? ')
-);
+// let lengthSecretNum = prompt(
+// 	chalk.magenta('What is your favorite number between 2 and 6? ')
+//);
+
+// Function for choosing level
+let lengthSecretNum = 0;
+let level = 0;
+
+function levelChooser() {
+	let levelInput = prompt(
+		chalk.black.yellow(
+			`Ok, ${name}? Which level would you like to play? Easy(1), medium(2) or hard(3)? `
+		)
+	);
+	if (levelInput == "1") {
+		console.log(`Ok, easy for you.`)
+		level = 1;
+		lengthSecretNum = 2;
+	}
+	else if (levelInput === "2") {
+		console.log(`Medium, of course.`)
+		level = 2;
+		lengthSecretNum = 3;
+	}
+	else if (levelInput === "3") {
+		console.log(`Hard, alright.`)
+		level = 3;
+		lengthSecretNum = 4;
+	}
+	else {
+		console.log(`Invalid input, please enter a number between 1 and 3.`)
+	}
+	return lengthSecretNum;
+}
+
+levelChooser();
 
 //Function > Computer comes up with secret number
 function createSecretNumber(length) {
@@ -29,7 +62,8 @@ function askForTheRules() {
 	);
 	console.clear();
 	if (question.toUpperCase() === 'N') {
-		showInstructions(lengthSecretNum);
+		levelChooser();
+		showInstructions(secretNumber.length); // here level acoording to user input
 	} else {
 		console.log(chalk.yellow(`\nLet´s go, ${name}`));
 	}
@@ -79,8 +113,23 @@ function wrongInputAlert(number, input) {
 	return true;
 }
 
-function randomMessage () {
-	const randomMessages = ['You did not match any numbers, try again.', 'Not a match, try your luck again!','Not the winning combo, but do not give up yet!', 'Those numbers were not magic. Go for another round!']
+// Function for random message
+function randomMessage() {
+	const randomMessages = [
+		'You did not match any numbers, try again.',
+		'Not a match, try your luck again!',
+		'Not the winning combo, but do not give up yet!',
+		'Those numbers were not magic. Go for another round!',
+		'Try again',
+		'Not your day, give it another try',
+		'Roll the dice again!',
+		'Do not worry, give it another try',
+	];
+
+	let randomMessage =
+		randomMessages[Math.floor(Math.random() * randomMessages.length)];
+
+	return randomMessage;
 }
 
 // Function play again
@@ -102,7 +151,7 @@ function playTheGame() {
 		attempts++;
 		const guessedNumber = prompt(chalk.yellow('Guess a number: '));
 		if (!wrongInputAlert(secretNumber, guessedNumber)) {
-			continue; //refer to function wronInputAlert that checks whether guessed input is valid / if yes, continue
+			continue; //refer to function wrongInputAlert that checks whether guessed input is valid / if yes, continue
 		}
 
 		if (secretNumber === guessedNumber) {
@@ -130,7 +179,7 @@ function playTheGame() {
 		}
 		//result:
 		if (bulls === 0 && cows === 0) {
-			console.log(chalk.red(`You did not match any numbers, try again.`));
+			console.log(chalk.red(randomMessage()));
 		} else {
 			console.log(chalk.blue(`You found ${cows} cows and ${bulls} bulls.`));
 		}
