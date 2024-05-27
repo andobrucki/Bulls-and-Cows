@@ -14,7 +14,7 @@ const randomMessages = [
 ];
 
 // Function for user name
-let name = prompt('What is your name? ');
+let name = prompt(chalk.blue('What is your name? '));
 function createUserName(nameInput) {
 	!nameInput ? (name = 'Stranger') : (name = name);
 }
@@ -25,21 +25,23 @@ createUserName(name);
 function levelChooser() {
 	let lengthSecretNum = 0;
 	let levelInput = prompt(
-		chalk.black.yellow(
+		chalk.blue(
 			`Ok, ${name}! Which level would you like to play? Easy(1), medium(2) or hard(3)? `
 		)
 	);
 	if (levelInput == '1') {
-		console.log(`Ok, easy for you.`);
+		console.log(chalk.yellow(`Ok, easy for you.`));
 		lengthSecretNum = 2;
 	} else if (levelInput === '2') {
-		console.log(`Medium, of course.`);
+		console.log(chalk.yellow(`Medium, of course.`));
 		lengthSecretNum = 3;
 	} else if (levelInput === '3') {
-		console.log(`Hard, alright.`);
+		console.log(chalk.yellow(`Hard, alright.`));
 		lengthSecretNum = 4;
 	} else {
-		console.log(`Invalid input, please enter a number between 1 and 3.`);
+		console.log(
+			chalk.redBright(`Invalid input, please enter a number between 1 and 3.`)
+		);
 		levelChooser();
 	}
 	return lengthSecretNum;
@@ -75,22 +77,22 @@ function askForTheRules(secretNumber) {
 
 // Function: show instructions
 function showInstructions(len) {
-	let instructions = `Bulls 🐂 and Cows 🐄 Game\n-------------------\n Acoording to your level choice you must guess the ${len} digit number I am thinking of. \n The number is composed of the digits 1-9.\n No digit appears more than once.\n After each of your guesses, I will tell you:\n The number of 🐂 bulls (digits in right place)\n The number of 🐄 cows (correct digits, but in the wrong place)\n `;
+	let instructions = `Bulls 🐂 and Cows 🐄 Game\n-------------------\n According to your level choice you must guess the ${len} digit number I am thinking of. \n The number is composed of the digits 1-9.\n No digit appears more than once.\n After each of your guesses, I will tell you:\n The number of 🐂 bulls (digits in right place)\n The number of 🐄 cows (correct digits, but in the wrong place)\n `;
 	console.log(chalk.blue(instructions));
 }
 
 // Function: wrong input alert // compare users guess with secret number
 function wrongInputAlert(number, input) {
+	if (!/^\d+$/.test(input)) {
+		console.log(chalk.red(`Hey, only numbers are allowed!`));
+		return false;
+	}
 	if (number.length !== input.length) {
 		console.log(
 			chalk.red(
 				`${input} is not a valid number! You need ${number.length} digits!`
 			)
 		);
-		return false;
-	}
-	if (!/^\d+$/.test(input)) {
-		console.log(chalk.red(`Hey, only numbers are allowed!`));
 		return false;
 	}
 	return true;
@@ -106,15 +108,15 @@ function randomMessage() {
 // Function: play game again
 function playAgain() {
 	let playAgainGame = '';
-	playAgainGame = prompt(chalk.yellow(`Do you want to play again? Y / N `));
+	playAgainGame = prompt(chalk.blue(`Do you want to play again? Y / N `));
 	if (playAgainGame.toUpperCase() === 'Y') {
 		start();
 	} else if (playAgainGame.toUpperCase() === 'N') {
 		console.log(
-			chalk.yellow(`Thanks for participating, ${name}. See you next time.`)
+			chalk.blue(`Thanks for participating, ${name}. See you next time.`)
 		);
 	} else {
-		console.log(chalk.yellow(`Invalid input.`));
+		console.log(chalk.red(`Invalid input.`));
 		playAgain();
 	}
 }
